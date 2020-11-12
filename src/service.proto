@@ -1,0 +1,21 @@
+syntax = "proto3";
+package RHINO;
+
+service KVService {
+  rpc Get(ReqKey) returns (RespValue) {}
+  rpc Insert(ReqKeyValue) returns (RespValue) {}
+};
+message ReqKey {
+    int64 qid = 1;
+    repeated string key = 2;
+};
+message ReqKeyValue {
+    int64 qid = 1;
+    repeated string key = 2;
+    repeated string value = 3;
+};
+
+message RespValue {
+    int32 status = 1;
+    repeated string value = 2;
+};
