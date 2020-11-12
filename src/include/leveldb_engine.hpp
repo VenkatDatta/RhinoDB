@@ -88,5 +88,5 @@ class LevelDBEngine : public BaseKVEngine {
     private:
         std::unique_ptr<leveldb::DB> _db;
 };
-}  // namespace TINYKV
+}  // namespace RHINO
 #endif

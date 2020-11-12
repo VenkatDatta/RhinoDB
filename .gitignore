@@ -4,6 +4,7 @@ CMakeFiles
 CMakeScripts
 Testing
 Makefile
+.vscode
 cmake
 cmake_install.cmake
 install_manifest.txt

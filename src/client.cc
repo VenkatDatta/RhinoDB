@@ -1,6 +1,3 @@
-// Copyright 2018 All Rights Reserved.
-// Author: codevil.w.m@gmail.com (M W)
-
 #include <assert.h>
 #include <errno.h>
 #include <chrono>

@@ -31,5 +31,5 @@ class PlainEngine : public BaseKVEngine {
         std::unordered_map<std::string, std::string> _map;
 
 };
-}  // namespace TINYKV
+}  // namespace RHINO
 #endif

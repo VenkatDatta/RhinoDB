@@ -14,6 +14,6 @@ class BaseKVEngine {
         virtual bool has_key(const std::string& key) = 0;
         virtual std::string operator[] (const std::string& key)  = 0;
 };
-}  // namespace TINYKV
+}  // namespace RHINO
 
 #endif  // BASE_KV_ENGINE_H_
