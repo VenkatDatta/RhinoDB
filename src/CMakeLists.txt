@@ -1,3 +1,6 @@
+# Minimum CMake version
+cmake_minimum_required(VERSION 3.15)
+
 # Protobuf
 set(protobuf_MODULE_COMPATIBLE TRUE)
 find_package(Protobuf CONFIG REQUIRED)
@@ -26,7 +29,7 @@ find_package(Glog REQUIRED)
 include_directories(${GLOG_INCLUDE_DIRS})
 
 # Proto file
-get_filename_component(hw_proto "service.proto" ABSOLUTE)
+get_filename_component(hw_proto network/service.proto ABSOLUTE)
 get_filename_component(hw_proto_path "${hw_proto}" PATH)
 
 # Generated sources
@@ -44,6 +47,22 @@ add_custom_command(
         "${hw_proto}"
       DEPENDS "${hw_proto}")
 
+# Storage Proto file
+get_filename_component(st_proto engine/storage.proto ABSOLUTE)
+get_filename_component(st_proto_path "${st_proto}" PATH)
+
+# Generated sources
+set(st_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/storage.pb.cc")
+set(st_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/storage.pb.h")
+add_custom_command(
+      OUTPUT "${st_proto_srcs}" "${st_proto_hdrs}"
+      COMMAND ${_PROTOBUF_PROTOC}
+      ARGS 
+        --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
+        -I "${st_proto_path}"
+        "${st_proto}"
+      DEPENDS "${st_proto}")
+
 #    LevelDB
 find_package(LevelDB REQUIRED)
 include_directories(${LEVELDB_INCLUDE})
@@ -57,22 +76,34 @@ if(LEVELDB_FOUND)
     )
 endif()
 
+file(GLOB_RECURSE sources ${PROJECT_SOURCE_DIR}/src/*.cc ${PROJECT_SOURCE_DIR}/src/*.h ${PROJECT_SOURCE_DIR}/src/*.hpp)
 
 # Include generated *.pb.h files
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+
 include_directories(include)
 
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+
 # Targets (client|server)
-foreach(_target
-  server client)
-  add_executable(${_target} "${_target}.cc"
+add_executable(client network/client.cpp
     ${hw_proto_srcs}
-    ${hw_grpc_srcs})
-  target_link_libraries(${_target}
+    ${hw_grpc_srcs} ${st_proto_srcs} ${sources})
+target_link_libraries(client
     ${_REFLECTION}
     ${GFLAGS_LIBRARIES}
     ${GLOG_LIBRARIES}
     ${_GRPC_GRPCPP}
     ${LEVELDB_LIBS}
     ${_PROTOBUF_LIBPROTOBUF})
-endforeach()
+
+add_executable(server network/server.cpp
+    ${hw_proto_srcs}
+    ${hw_grpc_srcs} ${st_proto_srcs} ${sources})
+  target_link_libraries(server
+    ${_REFLECTION}
+    ${GFLAGS_LIBRARIES}
+    ${GLOG_LIBRARIES}
+    ${_GRPC_GRPCPP}
+    ${LEVELDB_LIBS}
+    ${_PROTOBUF_LIBPROTOBUF})

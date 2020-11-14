@@ -6,11 +6,17 @@
 #include <unordered_map>
 #include <sstream>
 #include <functional>
-#include "base_kv_engine.hpp" 
+#include "engine/base_kv_engine.h" 
 #include "leveldb/db.h"
 #include "gflags/gflags.h"
 #include <glog/logging.h>
+#include <unordered_map>
+#include <memory>
+#include <vector>
+#include <string>
 DECLARE_string(db_dir);
+
+
 namespace RHINO {
 template<typename T, typename... Args>
 void args_str(std::ostringstream& oss, T&& t, Args&&... args) {
@@ -35,6 +41,8 @@ static int leveldb_work(std::function<T(Args...)> f, std::string op, Args&&... a
       return 0;
 
 }
+
+using std::unique_ptr;
 class LevelDBEngine : public BaseKVEngine {
     public:
         using LevelOpRet = std::function<leveldb::Status(const leveldb::WriteOptions,
@@ -45,12 +53,12 @@ class LevelDBEngine : public BaseKVEngine {
             leveldb::Options options;
             options.create_if_missing = true;
             leveldb::DB* db;
-            leveldb::Status status = leveldb::DB::Open(options, FLAGS_db_dir, &db);
+            leveldb::Status status = leveldb::DB::Open(options, "./db", &db);
             if (!status.ok()) {
-                LOG(ERROR) << "open leveldb [" << FLAGS_db_dir << "] failed.";
+                LOG(ERROR) << "open leveldb [" << "./db" << "] failed.";
                 return false;
             }
-            LOG(INFO) << "open leveldb [" << FLAGS_db_dir << "] complete.";
+            LOG(INFO) << "open leveldb [" << "./db" << "] complete.";
             _db.reset(db);
             return true;
         }
@@ -88,5 +96,5 @@ class LevelDBEngine : public BaseKVEngine {
     private:
         std::unique_ptr<leveldb::DB> _db;
 };
-}  // namespace RHINO
+}  // namespace TINYKV
 #endif
