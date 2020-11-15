@@ -1,0 +1,8 @@
+syntax="proto2";
+package RHINO.Storage;
+
+message Data {
+    required string value = 1;
+    required uint32 max_read_id_ = 2;
+    required uint32 version_id_ = 3;
+}
