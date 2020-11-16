@@ -5,8 +5,8 @@
 #include <set>
 
 #include "txn/lock_manager.h"
-#include "engine/rhino.h"
-#include "engine/types/leveldb_engine.h"
+#include "storage/storage.h"
+#include "storage/engine/leveldb_engine.h"
 
 // Thread & queue counts for StaticThreadPool initialization.
 #define THREAD_COUNT 4
@@ -22,9 +22,9 @@ TxnProcessor::TxnProcessor(CCMode mode)
   //test_ = new Rhino<RHINO::LevelDBEngine>();
   // Create the storage
   if (mode_ == MVCC) {
-    storage_ = new Rhino<RHINO::LevelDBEngine>();
+    storage_ = new Storage<RHINO::LevelDBEngine>();
   } else {
-    storage_ = new Rhino<RHINO::LevelDBEngine>();
+    storage_ = new Storage<RHINO::LevelDBEngine>();
   }
   storage_->init();
 

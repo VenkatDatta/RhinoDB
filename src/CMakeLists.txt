@@ -29,14 +29,14 @@ find_package(Glog REQUIRED)
 include_directories(${GLOG_INCLUDE_DIRS})
 
 # Proto file
-get_filename_component(hw_proto network/service.proto ABSOLUTE)
+get_filename_component(hw_proto proto/kvservice.proto ABSOLUTE)
 get_filename_component(hw_proto_path "${hw_proto}" PATH)
 
 # Generated sources
-set(hw_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/service.pb.cc")
-set(hw_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/service.pb.h")
-set(hw_grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/service.grpc.pb.cc")
-set(hw_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/service.grpc.pb.h")
+set(hw_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/kvservice.pb.cc")
+set(hw_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/kvservice.pb.h")
+set(hw_grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/kvservice.grpc.pb.cc")
+set(hw_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/kvservice.grpc.pb.h")
 add_custom_command(
       OUTPUT "${hw_proto_srcs}" "${hw_proto_hdrs}" "${hw_grpc_srcs}" "${hw_grpc_hdrs}"
       COMMAND ${_PROTOBUF_PROTOC}
@@ -48,7 +48,7 @@ add_custom_command(
       DEPENDS "${hw_proto}")
 
 # Storage Proto file
-get_filename_component(st_proto engine/storage.proto ABSOLUTE)
+get_filename_component(st_proto proto/storage.proto ABSOLUTE)
 get_filename_component(st_proto_path "${st_proto}" PATH)
 
 # Generated sources

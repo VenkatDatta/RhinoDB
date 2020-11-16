@@ -7,8 +7,8 @@
 
 #include "utils/common.h"
 #include "txn/lock_manager.h"
-#include "engine/rhino.h"
-#include "engine/types/leveldb_engine.h"
+#include "storage/storage.h"
+#include "storage/engine/leveldb_engine.h"
 #include "txn/transaction.h"
 #include "utils/atomic.h"
 #include "utils/static_thread_pool.h"
@@ -114,7 +114,7 @@ class TxnProcessor {
 
   // Data storage used for all modes.
 
-  Rhino<RHINO::LevelDBEngine>* storage_;
+  Storage<RHINO::LevelDBEngine>* storage_;
 
   // Next valid unique_id, and a mutex to guard incoming txn requests.
   int next_unique_id_;
