@@ -6,7 +6,7 @@ KV store will support Get, Insert and Delete operations. It is using LevelDB as 
 ## Design
 
 <p align="center">
-  <img  src="doc/simpleKV.png">
+  <img  src="doc/rhino.png">
 </p>
 
 ## Features
