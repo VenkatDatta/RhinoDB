@@ -17,7 +17,7 @@
 
 namespace RHINO {
 
-    struct Version {
+struct Version {
   Value value_;      // The value of this version
   int max_read_id_;  // Largest timestamp of a transaction that read the version
   int version_id_;   // Timestamp of the transaction that created(wrote) the version
@@ -27,7 +27,7 @@ using std::deque;
 using std::map;
 
 template <class T>
-class Rhino
+class Storage
 {
 private:
     typedef T DbEngine;
@@ -36,9 +36,9 @@ private:
 
     unordered_map<Key, Mutex*> mutexs_;
 public:
-    explicit Rhino();
+    explicit Storage();
 
-    virtual ~Rhino() = default;
+    virtual ~Storage() = default;
     
     virtual bool init();
     

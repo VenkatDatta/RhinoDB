@@ -14,7 +14,7 @@
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 #include <glog/logging.h>
-#include "service.grpc.pb.h"
+#include "kvservice.grpc.pb.h"
 
 using grpc::Channel;
 using grpc::ClientContext;

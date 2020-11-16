@@ -1,9 +1,9 @@
-#include "engine/rhino.h"
-#include "engine/types/leveldb_engine.h"
+#include "storage/storage.h"
+#include "storage/engine/leveldb_engine.h"
 
 namespace RHINO {
     template<class T>
-    Rhino<T>::Rhino()
+    Storage<T>::Storage()
     {
         _engine = new(std::nothrow) DbEngine();
 
@@ -12,22 +12,22 @@ namespace RHINO {
         }
     }
     template<class T>
-    bool Rhino<T>::init() {
+    bool Storage<T>::init() {
         return _engine->init();
     }
     
     template<class T>
-    void Rhino<T>::lock(Key key) {
+    void Storage<T>::lock(Key key) {
         mutexs_[key]->Lock();
     }
     
     template<class T>
-    void Rhino<T>::unLock(Key key) {
+    void Storage<T>::unLock(Key key) {
         mutexs_[key]->Unlock();
     }
 
     template<class T>
-    int Rhino<T>::insert(const Key& key, const Value& value, int txn_unique_id) {
+    int Storage<T>::insert(const Key& key, const Value& value, int txn_unique_id) {
 
         Version* new_update = new Version();
         new_update->value_ = value;
@@ -50,7 +50,7 @@ namespace RHINO {
     }
     
     template<class T>
-    int Rhino<T>::get(const Key& key, Value* value, int txn_unique_id) {
+    int Storage<T>::get(const Key& key, Value* value, int txn_unique_id) {
 
         if (!mvcc_data_.count(key)) {
             return false;
@@ -77,7 +77,7 @@ namespace RHINO {
     }
 
     template<class T>
-    bool Rhino<T>::checkWrite(Key key, int txn_unique_id) {
+    bool Storage<T>::checkWrite(Key key, int txn_unique_id) {
         // CPSC 638:
         //
         // Implement this method!
@@ -112,5 +112,5 @@ namespace RHINO {
         }
         return true;
     }
-template class Rhino<RHINO::LevelDBEngine>;
+template class Storage<RHINO::LevelDBEngine>;
 }
