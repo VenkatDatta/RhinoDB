@@ -12,7 +12,8 @@
 #include "utils/common.h"
 #include "txn/transaction.h"
 #include "utils/mutex.h"
-
+#include "storage.pb.h"
+#include "pbjson/pbjson.hpp"
 
 
 namespace RHINO {
@@ -41,6 +42,11 @@ public:
     virtual ~Storage() = default;
     
     virtual bool init();
+
+    virtual int rawPut(const std::string& key, const std::string& value);
+
+    
+    virtual int rawGet(const std::string& key, std::string* value);
     
     virtual int insert(const Key& key, const Value& value, int txn_unique_id = 0);
     

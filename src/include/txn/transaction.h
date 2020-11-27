@@ -59,7 +59,7 @@ class Transaction {
     protected:
         void copyTransactionInternals(Transaction * txn) const;
 
-        friend class TranasctionProcessor;
+        friend class TxnProcessor;
 
         bool read(const Key& key, Value* value);
         
