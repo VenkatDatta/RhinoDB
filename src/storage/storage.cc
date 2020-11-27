@@ -27,6 +27,23 @@ namespace RHINO {
     }
 
     template<class T>
+    int Storage<T>::rawPut(const std::string& key, const std::string& value) {
+        _engine->insert(std::make_pair(key, value));
+        return 0;
+    }
+    
+    template<class T>
+    int Storage<T>::rawGet(const std::string& key, std::string* value) {
+        if (!_engine->has_key(key)) {
+            fprintf(stderr, "get %s failed.\n", key.c_str());
+            return -1;
+        }
+
+        *value = (*_engine)[key];
+        return 0;
+    }
+
+    template<class T>
     int Storage<T>::insert(const Key& key, const Value& value, int txn_unique_id) {
 
         Version* new_update = new Version();
@@ -45,7 +62,6 @@ namespace RHINO {
 
         versions->push_front(new_update);
 
-        _engine->insert(std::make_pair(key, value));
         return 0;
     }
     

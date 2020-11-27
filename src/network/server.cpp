@@ -1,19 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unordered_map>
-#include "storage/old.h" 
+#include "storage/storage.h" 
 #include "grpcpp/grpcpp.h"
 #include "kvservice.grpc.pb.h"
 #include <glog/logging.h>
 #include "storage/engine/leveldb_engine.h"
-#include "storage/engine/plainkv_engine.h"
+#include "txn/processor.h"
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
-using RHINO::ReqKey;
-using RHINO::ReqKeyValue;
-using RHINO::RespValue;
+using RHINO::RawGetRequest;
+using RHINO::RawGetResponse;
+using RHINO::RawPutRequest;
+using RHINO::RawPutResponse;
+using RHINO::GetRequest;
+using RHINO::GetResponse;
+//using RHINO::TxnProcessor;
 
 DEFINE_string(db_dir, "./db", "local db dir");
 DEFINE_string(db_type, "plain", "local db engine type");
@@ -32,8 +36,8 @@ public:
       }
       return 0;
   }
-  Status Get(ServerContext* context, const ReqKey* request,
-                  RespValue* reply) override {
+  Status RawGet(ServerContext* context, const RawGetRequest* request,
+                  RawGetResponse* reply) override {
     if (request->key_size() == 0) {
         LOG(ERROR) << "Reqid=" << request->qid() << " miss request key.";
         return Status::OK;
@@ -49,8 +53,9 @@ public:
     }
     return Status::OK;
   }
-  Status Insert(ServerContext* context, const ReqKeyValue* req_key_value,
-                 RespValue* relay) override {
+  
+  Status RawPut(ServerContext* context, const RawPutRequest* req_key_value,
+                 RawPutResponse* reply) override {
       int key_size = req_key_value->key_size();
       int value_size = req_key_value->value_size();
       if (key_size != value_size) {
@@ -64,6 +69,12 @@ public:
       }
       return Status::OK;
   }
+
+  Status Get(ServerContext* context, const GetRequest* request, GetResponse* reply) override {
+
+    return Status::OK;
+  }
+  
 private:
   KVEngine* _kv_engine;
 };
@@ -80,12 +91,16 @@ private:
 
 int RunServer() {
   std::string server_address("0.0.0.0:50051");
-  KVServiceImpl<RHINO::Rhino<RHINO::LevelDBEngine>> *service =  new(std::nothrow)KVServiceImpl<RHINO::Rhino<RHINO::LevelDBEngine>>();
+  KVServiceImpl<RHINO::Storage<RHINO::LevelDBEngine>> *service =  new(std::nothrow)KVServiceImpl<RHINO::Storage<RHINO::LevelDBEngine>>();
 
+  /*
   if (!service->init()) {
     LOG(WARNING) << "KVServiceImpl init failed.";
     return -1;
-  }
+  }*/
+
+  LOG(INFO) << "Starting Txn Processor in background";
+  RHINO::TxnProcessor* processor = new RHINO::TxnProcessor(MVCC);
 
   ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());

@@ -33,10 +33,26 @@ class KVClient {
 
   int get(const std::string& key, std::string* value) {
     ClientContext context;
-    RHINO::ReqKey req_key;
+    RHINO::RawGetRequest req_key;
     req_key.set_qid(qid_++);
     req_key.add_key(key);
-    RHINO::RespValue rsp;
+    RHINO::RawGetResponse rsp;
+    Status status = stub_->RawGet(&context, req_key, &rsp);
+    if (!status.ok()) {
+        LOG(ERROR) << "kv get [" << key << "] failed."; 
+        return -1;
+    }
+    *value = rsp.value(0);
+    return 0;
+  }
+
+
+  int txnGet(const std::string& key, std::string* value) {
+    ClientContext context;
+    RHINO::GetRequest req_key;
+    req_key.set_version(0);
+    req_key.set_key(key);
+    RHINO::GetResponse rsp;
     Status status = stub_->Get(&context, req_key, &rsp);
     if (!status.ok()) {
         LOG(ERROR) << "kv get [" << key << "] failed."; 
@@ -48,12 +64,27 @@ class KVClient {
 
   int insert(const std::string& key, const std::string& value) {
     ClientContext context;
-    RHINO::ReqKeyValue req_key_value;
+    RHINO::RawPutRequest req_key_value;
     req_key_value.set_qid(qid_++);
     req_key_value.add_key(key);
     req_key_value.add_value(value);
-    RHINO::RespValue rsp_value;
-    Status status = stub_->Insert(&context, req_key_value, &rsp_value);
+    RHINO::RawPutResponse rsp_value;
+    Status status = stub_->RawPut(&context, req_key_value, &rsp_value);
+    if (!status.ok()) {
+        LOG(ERROR) << "kv insert [" << key << "] [" << value << "] failed.";
+        return -1;
+    }
+    return 0;
+  }
+
+  int txn_put(const std::string& key, const std::string& value) {
+    ClientContext context;
+    RHINO::PutRequest req_key_value;
+
+    req_key_value.set_key(key);
+    req_key_value.set_value(value);
+    RHINO::PutResponse rsp_value;
+    Status status = stub_->Put(&context, req_key_value, &rsp_value);
     if (!status.ok()) {
         LOG(ERROR) << "kv insert [" << key << "] [" << value << "] failed.";
         return -1;
@@ -116,6 +147,7 @@ int main(int argc, char** argv) {
   for (int i = 0; i < keys.size(); ++i) {
     kv_client.insert(keys[i], values[i]);
   }
+
   return 0;
 }
 
